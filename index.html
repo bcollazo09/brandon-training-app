@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Brandon Fitness">
+  <title>Brandon Fitness</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <div>
+    <small>PERSONAL TRAINING SYSTEM</small>
+    <h1>Brandon Fitness</h1>
+  </div>
+</header>
+
+<main>
+  <section id="today" class="view active">
+    <div class="card hero">
+      <div>
+        <small>TODAY</small>
+        <h2 id="dayTitle"></h2>
+        <p id="weekText"></p>
+      </div>
+      <button id="changeDay">Change</button>
+    </div>
+
+    <div class="card">
+      <h3>Quick check-in</h3>
+      <div class="grid">
+        <label>Bodyweight
+          <input id="bw" type="number" step="0.1" inputmode="decimal">
+        </label>
+        <label>Sleep hours
+          <input id="sleep" type="number" step="0.1" inputmode="decimal">
+        </label>
+        <label>Back pain
+          <input id="back" type="number" min="0" max="10" inputmode="numeric">
+        </label>
+        <label>Sciatica
+          <input id="sciatica" type="number" min="0" max="10" inputmode="numeric">
+        </label>
+      </div>
+      <button class="primary full" id="saveCheckin">Save check-in</button>
+    </div>
+
+    <div class="row">
+      <h3>Workout</h3>
+      <span id="rirBadge"></span>
+    </div>
+
+    <div id="workout"></div>
+    <button class="primary full sticky" id="finish">Finish workout</button>
+  </section>
+
+  <section id="program" class="view">
+    <div class="row">
+      <h2>Program</h2>
+      <button id="advanceWeek">Advance week</button>
+    </div>
+    <div class="card" id="weekGuide"></div>
+    <div id="programList"></div>
+  </section>
+
+  <section id="progress" class="view">
+    <h2>Progress</h2>
+    <div class="card">
+      <h3>Bodyweight</h3>
+      <canvas id="bwChart" width="700" height="280"></canvas>
+    </div>
+    <div class="card">
+      <h3>Pain and sciatica</h3>
+      <canvas id="painChart" width="700" height="280"></canvas>
+    </div>
+    <div class="card">
+      <h3>Exercise history</h3>
+      <select id="exerciseSelect"></select>
+      <div id="history"></div>
+    </div>
+  </section>
+
+  <section id="settings" class="view">
+    <h2>Settings</h2>
+    <div class="card">
+      <label>Current week
+        <input id="weekInput" type="number" min="1" max="8">
+      </label>
+      <button class="primary full" id="saveWeek">Save week</button>
+    </div>
+
+    <div class="card">
+      <h3>Backup</h3>
+      <p class="muted">Export before clearing Safari data or changing phones.</p>
+      <button class="full" id="exportBtn">Export backup</button>
+      <label class="file">Import backup
+        <input id="importFile" type="file" accept=".json,application/json">
+      </label>
+    </div>
+
+    <div class="card">
+      <button class="danger full" id="resetBtn">Erase local data</button>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-view="today" class="active">Today</button>
+  <button data-view="program">Program</button>
+  <button data-view="progress">Progress</button>
+  <button data-view="settings">Settings</button>
+</nav>
+
+<dialog id="dayDialog">
+  <div id="dayChoices"></div>
+  <button id="closeDialog">Cancel</button>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
