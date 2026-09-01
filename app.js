@@ -1,287 +1,119 @@
+const $=id=>document.getElementById(id);
 const PROGRAM={
-"Pull 1":[["Lat Pulldown",3,"6–10"],["Chest Supported Row",3,"6–10"],["Single Arm Cable Rear Delt",3,"12–20"],["Cable Pullover",2,"10–15"],["Supinated Cable Curl",3,"8–12"],["Rope Hammer Curl",2,"10–15"]],
-"Push 1":[["DB Bench",3,"6–10"],["Incline Machine Press",3,"8–12"],["Pec Fly",2,"12–15"],["Cable Lateral Raise",4,"12–20"],["Cable Skull Crusher",3,"10–15"],["Rope Pushdown",2,"12–15"]],
-"Legs":[["Hack Squat",3,"6–10"],["Hip Thrust",3,"8–12"],["Seated Leg Curl",3,"8–15"],["Leg Extension",2,"10–15"],["Hip Abductor",3,"15–20"],["Hip Adductor",2,"12–15"],["Standing Calf Raise",4,"8–15"]],
-"Pull 2":[["Wide Pulldown",3,"10–15"],["Chest Supported Machine Row",3,"10–15"],["Pec Deck Rear Delt",3,"15–20"],["Cable Pullover",2,"15–20"],["Cable Curl",3,"12–15"],["Hammer Rope Curl",3,"12–15"]],
-"Push 2":[["DB Bench",3,"10–15"],["Pec Fly",3,"15–20"],["Cable Lateral Raise",4,"15–20"],["Rope Pushdown",3,"12–15"],["Overhead Cable Extension",3,"12–15"]]
+"Pull 1":[
+ {name:"Lat Pulldown",baseSets:3,range:[6,10],increment:5,role:"compound",priority:true,muscle:"Lats/Back"},
+ {name:"Chest Supported Row",baseSets:3,range:[6,10],increment:5,role:"compound",priority:true,muscle:"Lats/Back"},
+ {name:"Single Arm Cable Rear Delt",baseSets:3,range:[12,20],increment:2.5,role:"isolation",priority:false,muscle:"Delts"},
+ {name:"Cable Pullover",baseSets:2,range:[10,15],increment:5,role:"isolation",priority:false,muscle:"Lats/Back"},
+ {name:"Supinated Cable Curl",baseSets:3,range:[8,12],increment:5,role:"isolation",priority:true,muscle:"Biceps"},
+ {name:"Rope Hammer Curl",baseSets:2,range:[10,15],increment:5,role:"isolation",priority:false,muscle:"Biceps"}],
+"Push 1":[
+ {name:"DB Bench",baseSets:3,range:[6,10],increment:5,role:"compound",priority:true,muscle:"Chest"},
+ {name:"Incline Machine Press",baseSets:3,range:[8,12],increment:5,role:"compound",priority:false,muscle:"Chest"},
+ {name:"Pec Fly",baseSets:2,range:[12,15],increment:5,role:"isolation",priority:false,muscle:"Chest"},
+ {name:"Cable Lateral Raise",baseSets:4,range:[12,20],increment:2.5,role:"isolation",priority:true,muscle:"Delts"},
+ {name:"Cable Skull Crusher",baseSets:3,range:[10,15],increment:5,role:"isolation",priority:true,muscle:"Triceps"},
+ {name:"Rope Pushdown",baseSets:2,range:[12,15],increment:5,role:"isolation",priority:false,muscle:"Triceps"}],
+"Legs":[
+ {name:"Hack Squat",baseSets:3,range:[6,10],increment:10,role:"compound",priority:true,muscle:"Quads"},
+ {name:"Hip Thrust",baseSets:3,range:[8,12],increment:10,role:"compound",priority:false,muscle:"Glutes"},
+ {name:"Seated Leg Curl",baseSets:3,range:[8,15],increment:5,role:"isolation",priority:true,muscle:"Hamstrings"},
+ {name:"Leg Extension",baseSets:2,range:[10,15],increment:5,role:"isolation",priority:false,muscle:"Quads"},
+ {name:"Hip Abductor",baseSets:3,range:[15,20],increment:5,role:"isolation",priority:false,muscle:"Glutes"},
+ {name:"Hip Adductor",baseSets:2,range:[12,15],increment:5,role:"isolation",priority:false,muscle:"Adductors"},
+ {name:"Standing Calf Raise",baseSets:4,range:[8,15],increment:5,role:"isolation",priority:true,muscle:"Calves"}],
+"Pull 2":[
+ {name:"Wide Pulldown",baseSets:3,range:[10,15],increment:5,role:"compound",priority:true,muscle:"Lats/Back"},
+ {name:"Chest Supported Machine Row",baseSets:3,range:[10,15],increment:5,role:"compound",priority:true,muscle:"Lats/Back"},
+ {name:"Pec Deck Rear Delt",baseSets:3,range:[15,20],increment:5,role:"isolation",priority:false,muscle:"Delts"},
+ {name:"Cable Pullover",baseSets:2,range:[15,20],increment:5,role:"isolation",priority:false,muscle:"Lats/Back"},
+ {name:"Cable Curl",baseSets:3,range:[12,15],increment:5,role:"isolation",priority:true,muscle:"Biceps"},
+ {name:"Hammer Rope Curl",baseSets:3,range:[12,15],increment:5,role:"isolation",priority:false,muscle:"Biceps"}],
+"Push 2":[
+ {name:"DB Bench",baseSets:3,range:[10,15],increment:5,role:"compound",priority:true,muscle:"Chest"},
+ {name:"Pec Fly",baseSets:3,range:[15,20],increment:5,role:"isolation",priority:false,muscle:"Chest"},
+ {name:"Cable Lateral Raise",baseSets:4,range:[15,20],increment:2.5,role:"isolation",priority:true,muscle:"Delts"},
+ {name:"Rope Pushdown",baseSets:3,range:[12,15],increment:5,role:"isolation",priority:true,muscle:"Triceps"},
+ {name:"Overhead Cable Extension",baseSets:3,range:[12,15],increment:5,role:"isolation",priority:false,muscle:"Triceps"}]
 };
-const GUIDE={
-1:["Base week","3 RIR","Establish a clean baseline."],
-2:["Build","2 RIR","Add reps. Add one set only if recovery is good."],
-3:["Build","2 RIR","Continue double progression without forcing volume."],
-4:["Load","1–2 RIR","Add load after reaching the top of the range."],
-5:["High volume","1 RIR","Add an isolation set only where recovery allows."],
-6:["Peak","0–1 RIR","Compounds stay controlled. Failure only on selected isolations."],
-7:["Highest recoverable volume","0–1 RIR","Push performance without lasting sciatica increase."],
-8:["Deload","4–5 RIR","Use about half the sets and 85–90% of usual load."]
+const WEEK_PLAN={
+1:{phase:"Base / resensitize",rir:"3 RIR",rirLow:3,repBias:"middle",note:"Start below late-cycle fatigue. Establish clean performance."},
+2:{phase:"Build I",rir:"2 RIR",rirLow:2,repBias:"middle",note:"Build reps before chasing load."},
+3:{phase:"Build II",rir:"2 RIR",rirLow:2,repBias:"upper",note:"Push toward the upper half of each rep range."},
+4:{phase:"Load",rir:"1–2 RIR",rirLow:1.5,repBias:"load",note:"A good week to add load when performance supports it."},
+5:{phase:"Volume",rir:"1 RIR",rirLow:1,repBias:"middle",note:"Priority movements earn an extra set when recovery is good."},
+6:{phase:"Peak build",rir:"0–1 RIR",rirLow:.5,repBias:"upper",note:"Hold technique. Isolation work may approach failure."},
+7:{phase:"Peak",rir:"0–1 RIR",rirLow:.5,repBias:"upper",note:"Highest planned stimulus. No forced progression if performance is falling."},
+8:{phase:"Deload",rir:"4–5 RIR",rirLow:4,repBias:"low",note:"About half the sets and ~85–90% of the prior non-deload load."}
 };
-const KEY="brandonFitnessV2";
-const OLD_KEY="brandonFitnessV1";
-const DEFAULT={
-  version:2,currentDay:"Pull 1",currentWeek:4,
-  mesocycle:{name:"Mesocycle 1",startDate:"",completed:[]},
-  workouts:[],checkins:[],timeline:[]
-};
-let state=load();
-
-function load(){
-  try{
-    const current=JSON.parse(localStorage.getItem(KEY));
-    if(current) return normalize({...DEFAULT,...current});
-    const old=JSON.parse(localStorage.getItem(OLD_KEY));
-    if(old){
-      const migrated=normalize({...DEFAULT,...old,currentWeek:old.currentWeek||4});
-      localStorage.setItem(KEY,JSON.stringify(migrated));
-      return migrated;
-    }
-  }catch(e){}
-  return structuredClone(DEFAULT);
-}
-function normalize(s){
-  s.mesocycle=s.mesocycle||structuredClone(DEFAULT.mesocycle);
-  s.mesocycle.completed=s.mesocycle.completed||[];
-  s.workouts=s.workouts||[];s.checkins=s.checkins||[];s.timeline=s.timeline||[];
-  return s;
-}
+const THERAPY=[
+ {name:"McGill Modified Curl-Up",sets:2,target:"5 reps · 8–10 sec holds"},
+ {name:"Side Plank",sets:2,target:"20–30 sec / side"},
+ {name:"Pallof Press",sets:2,target:"8–12 reps / side",load:true}
+];
+const KEY="brandonFitnessV3",OLD_KEYS=["brandonFitnessV2","brandonFitnessV1"];
+const DEFAULT={version:3,currentDay:"Pull 1",currentWeek:1,mesocycle:{name:"Mesocycle 1",startDate:"",archives:[]},workouts:[],checkins:[],therapyLogs:[],timeline:[],settings:{therapyDays:["Pull 1","Legs"]}};
+let state=load(),pendingWorkout=null,pendingResponse="same";
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function normalize(s){s.version=3;s.mesocycle=s.mesocycle||clone(DEFAULT.mesocycle);s.mesocycle.archives=s.mesocycle.archives||s.mesocycle.completed||[];s.workouts=s.workouts||[];s.checkins=s.checkins||[];s.therapyLogs=s.therapyLogs||[];s.timeline=s.timeline||[];s.settings=s.settings||clone(DEFAULT.settings);s.settings.therapyDays=s.settings.therapyDays||["Pull 1","Legs"];return s}
+function load(){try{let c=JSON.parse(localStorage.getItem(KEY));if(c)return normalize({...clone(DEFAULT),...c});for(const k of OLD_KEYS){let old=JSON.parse(localStorage.getItem(k));if(old){let migrated=normalize({...clone(DEFAULT),...old,currentWeek:old.currentWeek||1});localStorage.setItem(KEY,JSON.stringify(migrated));return migrated}}}catch(e){}return clone(DEFAULT)}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function today(){return new Date().toISOString().slice(0,10)}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
-function show(id){
-  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("active",v.id===id));
-  document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.view===id));
-  if(id==="history")renderHistory();
-  if(id==="progress")renderProgress();
-  if(id==="settings")renderSettings();
-}
-document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>show(b.dataset.view));
-
-function workoutSessions(day){return state.workouts.filter(w=>w.day===day).sort((a,b)=>a.timestamp-b.timestamp)}
-function priorExercise(name,before=Infinity){
-  for(let i=state.workouts.length-1;i>=0;i--){
-    const w=state.workouts[i];
-    if(w.timestamp>=before)continue;
-    const e=w.exercises.find(x=>x.name===name);
-    if(e)return{date:w.date,sets:e.sets,week:w.week};
-  }
-  return null;
-}
-function bestSet(sets){return [...sets].filter(s=>s.weight&&s.reps).sort((a,b)=>(b.weight*b.reps)-(a.weight*a.reps))[0]||null}
-function targetFor(name,range){
-  const p=priorExercise(name);
-  if(!p)return"No previous data. Start conservatively and establish a baseline.";
-  const valid=p.sets.filter(s=>s.weight&&s.reps);
-  if(!valid.length)return"Repeat the prescribed rep range and log all working sets.";
-  const [low,high]=range.split("–").map(Number);
-  const avg=valid.reduce((a,s)=>a+s.reps,0)/valid.length;
-  const weight=valid[0].weight;
-  if(avg>=high)return`Increase weight slightly from ${weight} lb and return near ${low} reps.`;
-  return`Keep ${weight} lb and try to add 1 total rep across the working sets.`;
-}
-function latestCheckin(){return [...state.checkins].sort((a,b)=>b.timestamp-a.timestamp)[0]||null}
-function recoveryScore(c){
-  if(!c)return null;
-  const sleepScore=Math.min(10,(c.sleep||7)/8*10);
-  const painPenalty=((c.backPain||0)+(c.sciatica||0))/2;
-  return Math.max(0,Math.min(10,sleepScore-painPenalty*.55));
-}
-function recommendation(){
-  const recent=[...state.checkins].sort((a,b)=>b.timestamp-a.timestamp).slice(0,7);
-  const c=latestCheckin();
-  if(!c)return{type:"",title:"Log a quick check-in",text:"A few seconds of sleep, bodyweight, back pain, and sciatica data will make recommendations more useful."};
-  const avg=(key)=>recent.filter(x=>x[key]!=null).reduce((a,x)=>a+x[key],0)/(recent.filter(x=>x[key]!=null).length||1);
-  const pain=avg("backPain"),sci=avg("sciatica"),sleepAvg=avg("sleep");
-  if(sci>=5||pain>=6)return{type:"warn",title:"Keep today controlled",text:"Your recent pain scores are elevated. Maintain load, avoid grinders, and stop any movement that meaningfully increases leg symptoms."};
-  if(sleepAvg&&sleepAvg<6)return{type:"warn",title:"Recovery is limited",text:"Recent sleep is under 6 hours. Maintain loads today rather than forcing progression."};
-  if(state.currentWeek===8)return{type:"good",title:"Deload week",text:"Use about half your normal sets and keep 4–5 reps in reserve."};
-  return{type:"good",title:"Progress normally",text:"Recent recovery data does not show an obvious reason to reduce today’s planned workload."};
-}
-
-function renderToday(){
-  const g=GUIDE[state.currentWeek];
-  mesoLabel.textContent=(state.mesocycle.name||"Mesocycle 1").toUpperCase();
-  dayTitle.textContent=state.currentDay;
-  weekText.textContent=`Week ${state.currentWeek}: ${g[0]} — ${g[2]}`;
-  summaryWeek.textContent=`${state.currentWeek}/8`;
-  summaryRir.textContent=g[1];
-  rirBadge.textContent=g[1];
-  const c=latestCheckin(),score=recoveryScore(c);
-  summaryWeight.textContent=c?.bodyweight?`${c.bodyweight} lb`:"—";
-  summaryRecovery.textContent=score==null?"—":`${score.toFixed(1)}/10`;
-
-  const todayCheck=[...state.checkins].reverse().find(x=>x.date===today());
-  bw.value=todayCheck?.bodyweight??"";
-  sleep.value=todayCheck?.sleep??"";
-  back.value=todayCheck?.backPain??"";
-  sciatica.value=todayCheck?.sciatica??"";
-
-  const rec=recommendation();
-  recommendationCard.className=`card recommendation ${rec.type}`;
-  recommendationCard.innerHTML=`<h3>${esc(rec.title)}</h3><p class="muted">${esc(rec.text)}</p>`;
-
-  workout.innerHTML="";
-  PROGRAM[state.currentDay].forEach(([name,sets,range])=>{
-    const prior=priorExercise(name);
-    const last=prior?`${prior.date}: ${prior.sets.map(s=>`${s.weight??"-"}×${s.reps??"-"}`).join(", ")}`:"No previous session";
-    const card=document.createElement("div");
-    card.className="card exercise";card.dataset.name=name;
-    card.innerHTML=`<h3>${esc(name)}</h3><p class="muted">${sets} sets · ${range} reps</p><p class="last">Last: ${esc(last)}</p><div class="goal">${esc(targetFor(name,range))}</div><div class="sets"></div><label>Notes<input class="note" placeholder="Form, pain, setup..."></label>`;
-    for(let i=1;i<=sets;i++){
-      const r=document.createElement("div");r.className="setrow";
-      r.innerHTML=`<span>Set ${i}</span><label>Weight<input class="weight" type="number" step=".5" inputmode="decimal"></label><label>Reps<input class="reps" type="number" inputmode="numeric"></label><label>RIR<input class="rir" type="number" min="0" max="10" inputmode="numeric"></label>`;
-      card.querySelector(".sets").appendChild(r);
-    }
-    workout.appendChild(card);
-  });
-}
-
-saveCheckin.onclick=()=>{
-  const item={date:today(),timestamp:Date.now(),bodyweight:bw.value?+bw.value:null,sleep:sleep.value?+sleep.value:null,backPain:back.value?+back.value:null,sciatica:sciatica.value?+sciatica.value:null};
-  state.checkins=state.checkins.filter(x=>x.date!==item.date);state.checkins.push(item);save();renderToday();alert("Check-in saved.");
-};
-finish.onclick=()=>{
-  const exercises=[...document.querySelectorAll(".exercise")].map(card=>({
-    name:card.dataset.name,
-    notes:card.querySelector(".note").value.trim(),
-    sets:[...card.querySelectorAll(".setrow")].map(r=>({
-      weight:r.querySelector(".weight").value?+r.querySelector(".weight").value:null,
-      reps:r.querySelector(".reps").value?+r.querySelector(".reps").value:null,
-      rir:r.querySelector(".rir").value?+r.querySelector(".rir").value:null
-    })).filter(s=>s.weight!==null||s.reps!==null||s.rir!==null)
-  })).filter(e=>e.sets.length);
-  if(!exercises.length)return alert("Enter at least one set first.");
-  state.workouts.push({date:today(),timestamp:Date.now(),day:state.currentDay,week:state.currentWeek,mesocycle:state.mesocycle.name,exercises});
-  save();alert("Workout saved.");renderToday();
-};
-
-function openDayDialog(){
-  dayChoices.innerHTML="";
-  Object.keys(PROGRAM).forEach(d=>{
-    const b=document.createElement("button");b.textContent=d;
-    b.onclick=()=>{state.currentDay=d;save();dayDialog.close();renderToday()};
-    dayChoices.appendChild(b);
-  });
-  dayDialog.showModal();
-}
-changeDay.onclick=openDayDialog;
-closeDayDialog.onclick=()=>dayDialog.close();
-
-function renderProgram(){
-  const g=GUIDE[state.currentWeek];
-  weekGuide.innerHTML=`<h3>Week ${state.currentWeek}: ${g[0]}</h3><p><strong>${g[1]}</strong></p><p class="muted">${g[2]}</p>`;
-  programList.innerHTML="";
-  Object.entries(PROGRAM).forEach(([d,es])=>{
-    const c=document.createElement("div");c.className="card";
-    c.innerHTML=`<h3>${d}</h3>`+es.map(([n,s,r])=>`<div class="programrow"><span>${esc(n)}</span><strong>${s} × ${r}</strong></div>`).join("");
-    programList.appendChild(c);
-  });
-}
-advanceWeek.onclick=()=>{state.currentWeek=state.currentWeek===8?1:state.currentWeek+1;save();renderProgram();renderToday()};
-
-function renderHistory(){
-  const workouts=[...state.workouts].sort((a,b)=>b.timestamp-a.timestamp);
-  const current=workouts.filter(w=>(w.mesocycle||state.mesocycle.name)===state.mesocycle.name);
-  const totalSets=current.reduce((a,w)=>a+w.exercises.reduce((b,e)=>b+e.sets.length,0),0);
-  const first=current[current.length-1],last=current[0];
-  mesoSummary.innerHTML=`<p><strong>${esc(state.mesocycle.name)}</strong></p><p class="muted">${current.length} workouts · ${totalSets} logged working sets${first?` · ${first.date} to ${last.date}`:""}</p>`;
-  historyList.innerHTML=workouts.length?workouts.map(w=>`<div class="historyitem"><strong>${esc(w.day)} · Week ${w.week}</strong><div class="history-meta">${w.date} · ${esc(w.mesocycle||"Legacy data")}</div><div class="muted">${w.exercises.map(e=>`${esc(e.name)}: ${e.sets.map(s=>`${s.weight??"-"}×${s.reps??"-"}`).join(", ")}`).join("<br>")}</div></div>`).join(""):"<p class='muted'>No workouts logged yet.</p>";
-}
-
-function buildPastForm(){
-  pastDate.value=today();pastWeek.value=Math.max(1,state.currentWeek-1);
-  pastDay.innerHTML=Object.keys(PROGRAM).map(d=>`<option>${d}</option>`).join("");
-  renderPastExercises();
-}
-function renderPastExercises(){
-  pastExercises.innerHTML="";
-  PROGRAM[pastDay.value].forEach(([name,sets,range])=>{
-    const div=document.createElement("div");div.className="past-exercise";div.dataset.name=name;
-    div.innerHTML=`<h4>${esc(name)}</h4><p class="muted">${sets} sets · ${range}</p><div class="past-grid"><label>Weight<input class="past-weight" type="number" step=".5"></label><label>Reps<input class="past-reps" placeholder="e.g. 10,10,9"></label><label>RIR<input class="past-rir" placeholder="e.g. 2,2,1"></label></div>`;
-    pastExercises.appendChild(div);
-  });
-}
-addPastBtn.onclick=()=>{buildPastForm();pastDialog.showModal()};
-quickAddBtn.onclick=()=>{buildPastForm();pastDialog.showModal()};
-pastDay.onchange=renderPastExercises;
-cancelPast.onclick=()=>pastDialog.close();
-pastForm.onsubmit=e=>{
-  e.preventDefault();
-  const exercises=[...document.querySelectorAll(".past-exercise")].map(div=>{
-    const weight=+div.querySelector(".past-weight").value||null;
-    const reps=div.querySelector(".past-reps").value.split(",").map(x=>+x.trim()).filter(Boolean);
-    const rirs=div.querySelector(".past-rir").value.split(",").map(x=>+x.trim()).filter(x=>!Number.isNaN(x));
-    const sets=reps.map((r,i)=>({weight,reps:r,rir:rirs[i]??null}));
-    return{name:div.dataset.name,notes:"Historical entry",sets};
-  }).filter(e=>e.sets.length);
-  if(!exercises.length)return alert("Enter at least one exercise.");
-  const ts=new Date(`${pastDate.value}T12:00:00`).getTime();
-  state.workouts.push({date:pastDate.value,timestamp:ts,day:pastDay.value,week:+pastWeek.value,mesocycle:state.mesocycle.name,exercises});
-  save();pastDialog.close();renderHistory();renderToday();alert("Past workout saved.");
-};
-
-function draw(canvas,rows,series,min,max){
-  const ctx=canvas.getContext("2d"),w=canvas.width,h=canvas.height,p=42;
-  ctx.clearRect(0,0,w,h);ctx.fillStyle="#0e1528";ctx.fillRect(0,0,w,h);
-  ctx.strokeStyle="#2a3552";ctx.lineWidth=1;
-  for(let i=0;i<5;i++){const y=p+(h-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke()}
-  if(rows.length<2){ctx.fillStyle="#aeb8ca";ctx.font="22px sans-serif";ctx.fillText("Add more entries to show a trend",p,h/2);return}
-  series.forEach(s=>{ctx.strokeStyle=s.color;ctx.lineWidth=4;ctx.beginPath();rows.forEach((r,i)=>{const x=p+(w-2*p)*i/(rows.length-1),val=r[s.key],y=h-p-(h-2*p)*(val-min)/(max-min||1);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()});
-}
-function renderProgress(){
-  const cs=[...state.checkins].sort((a,b)=>a.timestamp-b.timestamp);
-  const b=cs.filter(x=>x.bodyweight!=null).slice(-40);
-  if(b.length){const vals=b.map(x=>x.bodyweight);draw(bwChart,b,[{key:"bodyweight",color:"#60a5fa"}],Math.min(...vals)-2,Math.max(...vals)+2)}else draw(bwChart,[],[],0,1);
-  const p=cs.filter(x=>x.backPain!=null||x.sciatica!=null).slice(-40).map(x=>({...x,backPain:x.backPain??0,sciatica:x.sciatica??0}));
-  draw(painChart,p,[{key:"backPain",color:"#f59e0b"},{key:"sciatica",color:"#ef4444"}],0,10);
-  const names=[...new Set(Object.values(PROGRAM).flat().map(x=>x[0]))].sort();
-  exerciseSelect.innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join("");
-  exerciseSelect.onchange=renderExerciseProgress;renderExerciseProgress();
-}
-function renderExerciseProgress(){
-  const name=exerciseSelect.value,rows=[];
-  [...state.workouts].sort((a,b)=>a.timestamp-b.timestamp).forEach(w=>{
-    const e=w.exercises.find(x=>x.name===name);if(!e)return;
-    const b=bestSet(e.sets);if(b)rows.push({date:w.date,score:b.weight*b.reps,weight:b.weight,reps:b.reps});
-  });
-  if(rows.length){const vals=rows.map(x=>x.score);draw(exerciseChart,rows,[{key:"score",color:"#93c5fd"}],Math.min(...vals)*.9,Math.max(...vals)*1.1)}
-  else draw(exerciseChart,[],[],0,1);
-  exerciseHistory.innerHTML=rows.length?rows.slice(-10).reverse().map(r=>`<div class="historyitem"><strong>${r.date}</strong><div class="muted">${r.weight} lb × ${r.reps}</div></div>`).join(""):"<p class='muted'>No data yet.</p>";
-}
-
-function renderSettings(){
-  mesoNameInput.value=state.mesocycle.name||"Mesocycle 1";
-  weekInput.value=state.currentWeek;
-  mesoStartInput.value=state.mesocycle.startDate||"";
-}
-saveMeso.onclick=()=>{
-  state.mesocycle.name=mesoNameInput.value.trim()||"Mesocycle 1";
-  state.mesocycle.startDate=mesoStartInput.value;
-  state.currentWeek=Math.max(1,Math.min(8,+weekInput.value||1));
-  save();renderToday();renderProgram();alert("Mesocycle saved.");
-};
-completeMeso.onclick=()=>{
-  if(!confirm("Archive this mesocycle and begin a new one?"))return;
-  const related=state.workouts.filter(w=>(w.mesocycle||state.mesocycle.name)===state.mesocycle.name);
-  state.mesocycle.completed.push({
-    name:state.mesocycle.name,startDate:state.mesocycle.startDate,endDate:today(),
-    workoutCount:related.length
-  });
-  state.timeline.push({date:today(),type:"mesocycle_completed",text:`Completed ${state.mesocycle.name}`});
-  state.mesocycle.name=`Mesocycle ${state.mesocycle.completed.length+1}`;
-  state.mesocycle.startDate=today();state.currentWeek=1;save();renderSettings();renderToday();alert("Mesocycle archived.");
-};
-exportBtn.onclick=()=>{
-  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
-  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`brandon-fitness-backup-${today()}.json`;a.click();URL.revokeObjectURL(a.href);
-};
-importFile.onchange=async e=>{
-  try{state=normalize({...DEFAULT,...JSON.parse(await e.target.files[0].text())});save();renderToday();renderProgram();alert("Backup imported.");}
-  catch{alert("Could not read that backup.");}
-};
-resetBtn.onclick=()=>{
-  if(confirm("Erase all workouts, check-ins, and mesocycles on this device?")){
-    localStorage.removeItem(KEY);state=structuredClone(DEFAULT);save();renderToday();renderProgram();alert("Data erased.");
-  }
-};
-
-renderToday();renderProgram();
-if("serviceWorker"in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("service-worker.js"));
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===id));document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id));if(id==='history')renderHistory();if(id==='progress')renderProgress();if(id==='program')renderProgram();if(id==='settings')renderSettings()}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.view));
+function exerciseConfig(name){for(const es of Object.values(PROGRAM)){const e=es.find(x=>x.name===name);if(e)return e}return null}
+function e1rm(w,r){if(!w||!r)return 0;return w*(1+r/30)}
+function metrics(sets){const v=sets.filter(s=>s.weight&&s.reps);if(!v.length)return{e1rm:0,volume:0,totalReps:0,avgReps:0,avgRir:null,maxWeight:0,minReps:0,maxReps:0};const rirs=v.filter(s=>s.rir!=null).map(s=>+s.rir);return{e1rm:Math.max(...v.map(s=>e1rm(+s.weight,+s.reps))),volume:v.reduce((a,s)=>a+(+s.weight*+s.reps),0),totalReps:v.reduce((a,s)=>a+(+s.reps),0),avgReps:v.reduce((a,s)=>a+(+s.reps),0)/v.length,avgRir:rirs.length?rirs.reduce((a,x)=>a+x,0)/rirs.length:null,maxWeight:Math.max(...v.map(s=>+s.weight)),minReps:Math.min(...v.map(s=>+s.reps)),maxReps:Math.max(...v.map(s=>+s.reps))}}
+function sessionsFor(name,{excludeDeload=false,meso=null,day=null}={}){return state.workouts.filter(w=>(!meso||w.mesocycle===meso)&&(!day||w.day===day)&&(!excludeDeload||w.week!==8)&&w.exercises?.some(e=>e.name===name)).sort((a,b)=>a.timestamp-b.timestamp).map(w=>{const ex=w.exercises.find(e=>e.name===name);return{...w,exercise:ex,m:metrics(ex.sets)}})}
+function roundIncrement(x,inc){return Math.max(inc,Math.round(x/inc)*inc)}
+function recentCheckins(n=5){return [...state.checkins].sort((a,b)=>b.timestamp-a.timestamp).slice(0,n)}
+function readiness(){const rs=recentCheckins(5),latest=rs[0];if(!latest)return{level:'unknown',title:'No recovery flag',text:'No check-in yet. The app will not change planned volume without data.'};const older=rs.slice(1);const avg=k=>older.filter(x=>x[k]!=null).reduce((a,x)=>a+x[k],0)/(older.filter(x=>x[k]!=null).length||1);const backDelta=latest.backPain!=null&&older.length?latest.backPain-avg('backPain'):0;const sciDelta=latest.sciatica!=null&&older.length?latest.sciatica-avg('sciatica'):0;if((latest.sciatica??0)>=5||(latest.backPain??0)>=6||backDelta>=2||sciDelta>=2)return{level:'caution',title:'Recovery flag: caution',text:'Recent back/leg symptoms are elevated. No extra sets today; maintain or reduce load if symptoms are active.'};if(latest.sleep!=null&&latest.sleep<6)return{level:'caution',title:'Recovery flag: low sleep',text:'Sleep is under 6 hours. Keep the planned sets but do not force load progression.'};return{level:'good',title:'Recovery flag: good',text:'No obvious recovery reason to reduce the planned session.'}}
+function plannedSets(ex){const w=state.currentWeek,r=readiness();if(w===8)return Math.max(1,Math.ceil(ex.baseSets/2));if(w===1)return ex.baseSets>=3?ex.baseSets-1:ex.baseSets;if(w>=5&&w<=7&&ex.priority&&r.level!=='caution')return ex.baseSets+1;return ex.baseSets}
+function targetRepBand(ex){const [lo,hi]=ex.range,p=WEEK_PLAN[state.currentWeek],span=hi-lo;if(p.repBias==='low')return[lo,Math.max(lo,Math.round(lo+span*.35))];if(p.repBias==='middle')return[Math.round(lo+span*.25),Math.round(lo+span*.65)];if(p.repBias==='upper')return[Math.round(lo+span*.55),hi];if(p.repBias==='load')return[lo,Math.round(lo+span*.5)];return[lo,hi]}
+function coachTarget(ex){const w=state.currentWeek,p=WEEK_PLAN[w],planned=plannedSets(ex),band=targetRepBand(ex),all=sessionsFor(ex.name,{day:state.currentDay}),prior=all[all.length-1],nonDeload=sessionsFor(ex.name,{excludeDeload:true,day:state.currentDay}),anchor=nonDeload[nonDeload.length-1];if(!anchor)return{action:'baseline',title:`${planned} sets · ${band[0]}–${band[1]} reps · ${p.rir}`,text:'No reliable prior session. Pick a conservative load that lands inside the target rep band.',meta:'The app will start making exact load calls after a complete exposure.'};if(w===8){const load=roundIncrement(anchor.m.maxWeight*.875,ex.increment);return{action:'deload',title:`Deload: ${planned} sets at about ${load} lb`,text:`Aim ${band[0]}–${band[1]} reps and stop with ${p.rir}. Do not chase a PR or add reps beyond the target.`,meta:`Based on your last non-deload working load of ${anchor.m.maxWeight} lb.`}}
+let ref=prior&&prior.week!==8?prior:anchor,rm=ref.m,load=rm.maxWeight||anchor.m.maxWeight,trend=0;if(nonDeload.length>=2){let a=nonDeload[Math.max(0,nonDeload.length-3)].m.e1rm,b=nonDeload[nonDeload.length-1].m.e1rm;trend=a?((b/a)-1)*100:0}
+if(w===1){const start=roundIncrement(anchor.m.maxWeight*.95,ex.increment);return{action:'reduce',title:`Reset: ${planned} sets around ${start} lb`,text:`Aim ${band[0]}–${band[1]} reps at ${p.rir}. Start ~5% below late-cycle load, then build from there.`,meta:`Previous non-deload e1RM: ${anchor.m.e1rm.toFixed(1)} lb.`}}
+const tooHard=(rm.avgRir!=null&&rm.avgRir<p.rirLow-1)||rm.avgReps<ex.range[0];const capped=rm.minReps>=ex.range[1]&&(rm.avgRir==null||rm.avgRir>=Math.max(1,p.rirLow));const regression=trend<=-3;
+if(tooHard||regression){const next=roundIncrement(Math.max(ex.increment,load-ex.increment),ex.increment);return{action:'reduce',title:`Back off to about ${next} lb`,text:`Last performance was ${tooHard?'harder than this week’s target':'trending down across recent exposures'}. Keep ${planned} sets and re-enter the rep range cleanly.`,meta:`Recent e1RM trend: ${trend>=0?'+':''}${trend.toFixed(1)}%.`}}
+if(capped){const next=roundIncrement(load+ex.increment,ex.increment);return{action:'increase',title:`Increase to about ${next} lb`,text:`You reached the top of the range across the working sets without overshooting the RIR target. Use ${planned} sets and aim ${band[0]}–${band[1]} reps.`,meta:`This is a rule-based load increase, not an automatic weekly increase.`}}
+if(w===4&&rm.avgReps>=(ex.range[0]+ex.range[1])/2&&(rm.avgRir==null||rm.avgRir>=1.5)){const next=roundIncrement(load+ex.increment,ex.increment);return{action:'increase',title:`Load week: try about ${next} lb`,text:`Your last session supports a small load jump. Aim ${band[0]}–${band[1]} reps at ${p.rir}.`,meta:`Recent e1RM trend: ${trend>=0?'+':''}${trend.toFixed(1)}%.`}}
+const extra=planned>ex.baseSets?` An extra priority set is planned this week because recovery is not flagged.`:'';return{action:'maintain',title:`Keep about ${load} lb · ${planned} sets`,text:`Aim ${band[0]}–${band[1]} reps at ${p.rir}. Beat the prior session only if it happens inside the RIR target.${extra}`,meta:`Recent e1RM trend: ${trend>=0?'+':''}${trend.toFixed(1)}%.`}}
+function renderToday(){const p=WEEK_PLAN[state.currentWeek],r=readiness();$('mesoLabel').textContent=(state.mesocycle.name||'Mesocycle').toUpperCase();$('dayTitle').textContent=state.currentDay;$('weekText').textContent=`Week ${state.currentWeek}/8 · ${p.phase}`;$('rirBadge').textContent=p.rir;$('weekCard').innerHTML=`<h3>${p.phase}</h3><p>${esc(p.note)}</p><div class="week-grid"><div><span>RIR target</span><strong>${p.rir}</strong></div><div><span>Volume</span><strong>${state.currentWeek===8?'~50%':state.currentWeek>=5?'Priority ↑':state.currentWeek===1?'Reduced base':'Base'}</strong></div><div><span>Progression</span><strong>${state.currentWeek===8?'None':state.currentWeek===4?'Load-biased':'Performance-based'}</strong></div></div>`;const tc=[...state.checkins].reverse().find(x=>x.date===today());$('bw').value=tc?.bodyweight??'';$('sleep').value=tc?.sleep??'';$('back').value=tc?.backPain??'';$('sciatica').value=tc?.sciatica??'';$('readinessCard').className=`card recommendation ${r.level==='caution'?'warn':r.level==='good'?'good':''}`;$('readinessCard').innerHTML=`<h3>${esc(r.title)}</h3><p class="muted">${esc(r.text)}</p>`;$('workout').innerHTML='';PROGRAM[state.currentDay].forEach(ex=>{const c=coachTarget(ex),all=sessionsFor(ex.name,{day:state.currentDay}),prior=all[all.length-1],sets=plannedSets(ex),card=document.createElement('div');card.className='card exercise';card.dataset.name=ex.name;card.innerHTML=`<h3>${esc(ex.name)}</h3><p class="muted">This week: ${sets} sets · ${targetRepBand(ex)[0]}–${targetRepBand(ex)[1]} reps <span class="tiny">(exercise range ${ex.range[0]}–${ex.range[1]})</span></p><p class="last">${prior?`Last: ${prior.date} · ${prior.exercise.sets.map(s=>`${s.weight??'-'}×${s.reps??'-'}${s.rir!=null?` @${s.rir}RIR`:''}`).join(', ')}`:'No prior session'}</p><div class="coach ${c.action}"><strong>${esc(c.title)}</strong><span>${esc(c.text)}</span><div class="coach-meta">${esc(c.meta)}</div></div><div class="sets"></div><label>Notes<input class="note" placeholder="Optional"></label>`;for(let i=1;i<=sets;i++){const row=document.createElement('div');row.className='setrow';row.innerHTML=`<span>Set ${i}</span><label>Weight<input class="weight" type="number" step=".5" inputmode="decimal"></label><label>Reps<input class="reps" type="number" inputmode="numeric"></label><label>RIR<input class="rir" type="number" min="0" max="10" step=".5" inputmode="decimal"></label>`;card.querySelector('.sets').appendChild(row)}$('workout').appendChild(card)});renderTherapy()}
+function renderTherapy(){const due=state.settings.therapyDays.includes(state.currentDay);$('therapyWrap').style.display=due?'block':'none';if(!due)return;$('therapy').innerHTML='';THERAPY.forEach(t=>{const card=document.createElement('div');card.className='card therapy-card';card.dataset.name=t.name;let rows='';for(let i=1;i<=t.sets;i++)rows+=`<label class="therapy-set"><input type="checkbox" class="therapy-check"><span>Set ${i} · ${esc(t.target)}</span>${t.load?'<input class="therapy-load" type="number" step=".5" placeholder="lb" style="width:80px">':''}</label>`;card.innerHTML=`<h3>${esc(t.name)}</h3>${rows}`;$('therapy').appendChild(card)});const end=document.createElement('div');end.className='card';end.innerHTML=`<h3>Therapy response</h3><div class="therapy-response"><button data-tresp="better">Better</button><button data-tresp="same" class="selected">Same</button><button data-tresp="worse">Worse</button></div>`;$('therapy').appendChild(end);document.querySelectorAll('[data-tresp]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-tresp]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')})}
+$('saveCheckin').onclick=()=>{const item={date:today(),timestamp:Date.now(),bodyweight:$('bw').value?+$('bw').value:null,sleep:$('sleep').value?+$('sleep').value:null,backPain:$('back').value?+$('back').value:null,sciatica:$('sciatica').value?+$('sciatica').value:null};state.checkins=state.checkins.filter(x=>x.date!==item.date);state.checkins.push(item);save();renderToday();alert('Check-in saved.')}
+function collectWorkout(){const exercises=[...document.querySelectorAll('.exercise')].map(card=>({name:card.dataset.name,notes:card.querySelector('.note').value.trim(),sets:[...card.querySelectorAll('.setrow')].map(r=>({weight:r.querySelector('.weight').value?+r.querySelector('.weight').value:null,reps:r.querySelector('.reps').value?+r.querySelector('.reps').value:null,rir:r.querySelector('.rir').value!==''?+r.querySelector('.rir').value:null})).filter(s=>s.weight!==null||s.reps!==null||s.rir!==null)})).filter(e=>e.sets.length);return exercises}
+function collectTherapy(){if(!state.settings.therapyDays.includes(state.currentDay))return null;const items=[...document.querySelectorAll('.therapy-card')].map(c=>({name:c.dataset.name,completed:[...c.querySelectorAll('.therapy-check')].filter(x=>x.checked).length,planned:c.querySelectorAll('.therapy-check').length,loads:[...c.querySelectorAll('.therapy-load')].map(x=>x.value?+x.value:null)}));const sel=document.querySelector('[data-tresp].selected');return{date:today(),timestamp:Date.now(),day:state.currentDay,items,response:sel?.dataset.tresp||'same'}}
+$('finish').onclick=()=>{const exercises=collectWorkout();if(!exercises.length)return alert('Enter at least one working set first.');pendingWorkout={date:today(),timestamp:Date.now(),day:state.currentDay,week:state.currentWeek,mesocycle:state.mesocycle.name,exercises};const t=collectTherapy();if(t&&t.items.some(i=>i.completed>0))state.therapyLogs.push(t);$('aggravator').innerHTML=['Not sure',...exercises.map(e=>e.name)].map(x=>`<option>${esc(x)}</option>`).join('');pendingResponse='same';document.querySelectorAll('[data-response]').forEach(b=>b.classList.toggle('selected',b.dataset.response==='same'));$('aggravatorWrap').hidden=true;$('postDialog').showModal()}
+document.querySelectorAll('[data-response]').forEach(b=>b.onclick=()=>{pendingResponse=b.dataset.response;document.querySelectorAll('[data-response]').forEach(x=>x.classList.toggle('selected',x===b));$('aggravatorWrap').hidden=pendingResponse!=='worse'})
+$('savePostResponse').onclick=()=>{if(!pendingWorkout)return;$('postDialog').close();pendingWorkout.symptomResponse=pendingResponse;pendingWorkout.aggravator=pendingResponse==='worse'?$('aggravator').value:null;state.workouts.push(pendingWorkout);pendingWorkout=null;save();alert('Workout saved.');renderToday()}
+function openDay(){ $('dayChoices').innerHTML='';Object.keys(PROGRAM).forEach(d=>{const b=document.createElement('button');b.textContent=d;b.onclick=()=>{state.currentDay=d;save();$('dayDialog').close();renderToday()};$('dayChoices').appendChild(b)});$('dayDialog').showModal() }
+$('changeDay').onclick=openDay;$('closeDayDialog').onclick=()=>$('dayDialog').close();
+function renderProgram(){const p=WEEK_PLAN[state.currentWeek];$('weekGuide').innerHTML=`<h3>Week ${state.currentWeek}: ${p.phase}</h3><p><strong>${p.rir}</strong></p><p class="muted">${esc(p.note)}</p>`;$('programList').innerHTML='';Object.entries(PROGRAM).forEach(([day,es])=>{const c=document.createElement('div');c.className='card';c.innerHTML=`<h3>${day}</h3>`+es.map(e=>`<div class="programrow"><span>${esc(e.name)}</span><strong>${plannedSets(e)} × ${targetRepBand(e)[0]}–${targetRepBand(e)[1]}</strong></div>`).join('');$('programList').appendChild(c)})}
+$('advanceWeek').onclick=()=>{state.currentWeek=Math.min(8,state.currentWeek+1);save();renderProgram();renderToday()}
+function currentMesoWorkouts(){return state.workouts.filter(w=>w.mesocycle===state.mesocycle.name)}
+function mesoPerformance(name){const s=sessionsFor(name,{excludeDeload:true,meso:state.mesocycle.name});if(!s.length)return null;return{first:s[0],last:s[s.length-1],change:s[0].m.e1rm?((s[s.length-1].m.e1rm/s[0].m.e1rm)-1)*100:0}}
+function renderHistory(){const ws=[...state.workouts].sort((a,b)=>b.timestamp-a.timestamp),cur=currentMesoWorkouts(),sets=cur.reduce((a,w)=>a+w.exercises.reduce((b,e)=>b+e.sets.length,0),0),bench=mesoPerformance('DB Bench');$('mesoSummary').innerHTML=`<p><strong>${esc(state.mesocycle.name)}</strong></p><p class="muted">${cur.length} workouts · ${sets} working sets${bench?` · DB Bench e1RM ${bench.change>=0?'+':''}${bench.change.toFixed(1)}%`:''}</p>`;$('historyList').innerHTML=ws.length?ws.map(w=>`<div class="historyitem"><strong>${esc(w.day)} · Week ${w.week}</strong><div class="history-meta">${w.date} · ${esc(w.mesocycle||'Legacy')}</div><div class="muted">${w.exercises.map(e=>{const m=metrics(e.sets);return `${esc(e.name)}: ${e.sets.map(s=>`${s.weight??'-'}×${s.reps??'-'}`).join(', ')}${m.e1rm?` · e1RM ${m.e1rm.toFixed(1)}`:''}`}).join('<br>')}</div>${w.symptomResponse?`<div class="tiny">Back/leg response: ${esc(w.symptomResponse)}${w.aggravator?` · ${esc(w.aggravator)}`:''}</div>`:''}</div>`).join(''):`<p class="muted">No workouts logged.</p>`}
+function buildPast(){ $('pastDate').value=today();$('pastWeek').value=Math.max(1,state.currentWeek-1);$('pastDay').innerHTML=Object.keys(PROGRAM).map(d=>`<option>${d}</option>`).join('');renderPastExercises() }
+function renderPastExercises(){const day=$('pastDay').value;$('pastExercises').innerHTML='';PROGRAM[day].forEach(ex=>{const d=document.createElement('div');d.className='past-exercise';d.dataset.name=ex.name;d.innerHTML=`<h4>${esc(ex.name)}</h4><div class="past-grid"><label>Weight<input class="past-weight" type="number" step=".5"></label><label>Reps<input class="past-reps" placeholder="10,10,9"></label><label>RIR<input class="past-rir" placeholder="2,2,1"></label></div>`;$('pastExercises').appendChild(d)})}
+$('addPastBtn').onclick=()=>{buildPast();$('pastDialog').showModal()};$('quickAddBtn').onclick=()=>{buildPast();$('pastDialog').showModal()};$('pastDay').onchange=renderPastExercises;$('cancelPast').onclick=()=>$('pastDialog').close();$('pastForm').onsubmit=e=>{e.preventDefault();const exercises=[...document.querySelectorAll('.past-exercise')].map(d=>{const weight=+d.querySelector('.past-weight').value||null,reps=d.querySelector('.past-reps').value.split(',').map(x=>+x.trim()).filter(x=>Number.isFinite(x)&&x>0),rirs=d.querySelector('.past-rir').value.split(',').map(x=>+x.trim());return{name:d.dataset.name,notes:'Historical entry',sets:reps.map((r,i)=>({weight,reps:r,rir:Number.isFinite(rirs[i])?rirs[i]:null}))}}).filter(e=>e.sets.length);if(!exercises.length)return alert('Enter at least one exercise.');state.workouts.push({date:$('pastDate').value,timestamp:new Date(`${$('pastDate').value}T12:00:00`).getTime(),day:$('pastDay').value,week:+$('pastWeek').value,mesocycle:state.mesocycle.name,exercises});save();$('pastDialog').close();renderHistory();alert('Past workout saved.')}
+function drawLine(canvas,rows,series,min,max){const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,p=44;ctx.clearRect(0,0,w,h);ctx.fillStyle='#0e1528';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#2a3552';ctx.lineWidth=1;for(let i=0;i<5;i++){const y=p+(h-2*p)*i/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke()}if(rows.length<2){ctx.fillStyle='#aeb8ca';ctx.font='20px sans-serif';ctx.fillText('Add more sessions to show a trend',p,h/2);return}series.forEach(s=>{ctx.strokeStyle=s.color;ctx.lineWidth=4;ctx.beginPath();rows.forEach((r,i)=>{const x=p+(w-2*p)*i/(rows.length-1),val=r[s.key],y=h-p-(h-2*p)*(val-min)/(max-min||1);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke()})}
+function drawBars(canvas,labels,vals){const ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height,p=48;ctx.clearRect(0,0,w,h);ctx.fillStyle='#0e1528';ctx.fillRect(0,0,w,h);if(!vals.length)return;const max=Math.max(1,...vals),bw=(w-2*p)/vals.length*.62;vals.forEach((v,i)=>{const x=p+(w-2*p)*(i+.5)/vals.length,y=h-p-(h-2*p)*v/max;ctx.fillStyle='#60a5fa';ctx.fillRect(x-bw/2,y,bw,h-p-y);ctx.fillStyle='#aeb8ca';ctx.font='16px sans-serif';ctx.textAlign='center';ctx.fillText(labels[i],x,h-20)});ctx.textAlign='start'}
+function allExerciseNames(){return [...new Set(Object.values(PROGRAM).flat().map(x=>x.name))].sort()}
+function exerciseInsight(name){const s=sessionsFor(name,{excludeDeload:true,meso:state.mesocycle.name});if(s.length<2)return null;const first=s[0],last=s[s.length-1],pct=((last.m.e1rm/first.m.e1rm)-1)*100,weightChange=last.m.maxWeight-first.m.maxWeight;let text=`${name} estimated 1RM is ${pct>=0?'+':''}${pct.toFixed(1)}% this mesocycle.`;if(weightChange<0&&pct>0)text+=` Raw weight is lower, but the extra reps produced a higher estimated strength level.`;if(s.length>=3){const last3=s.slice(-3).map(x=>x.m.e1rm),spread=(Math.max(...last3)-Math.min(...last3))/(last3.reduce((a,x)=>a+x,0)/last3.length)*100;if(spread<1.5)text+=` The last 3 exposures are essentially flat, so this is a plateau signal—not a reason to automatically add weight.`}return{pct,text}}
+function renderProgress(){const names=allExerciseNames(),old=$('exerciseSelect').value;$('exerciseSelect').innerHTML=names.map(n=>`<option>${esc(n)}</option>`).join('');if(names.includes(old))$('exerciseSelect').value=old;$('exerciseSelect').onchange=renderExercise;renderExercise();const cs=[...state.checkins].sort((a,b)=>a.timestamp-b.timestamp),b=cs.filter(x=>x.bodyweight!=null).slice(-50);if(b.length){const vals=b.map(x=>x.bodyweight);drawLine($('bwChart'),b,[{key:'bodyweight',color:'#60a5fa'}],Math.min(...vals)-2,Math.max(...vals)+2)}else drawLine($('bwChart'),[],[],0,1);const p=cs.filter(x=>x.backPain!=null||x.sciatica!=null).slice(-50).map(x=>({...x,backPain:x.backPain??0,sciatica:x.sciatica??0}));drawLine($('painChart'),p,[{key:'backPain',color:'#f59e0b'},{key:'sciatica',color:'#ef4444'}],0,10);renderVolume();renderInsights();renderTherapyStats()}
+function renderExercise(){const name=$('exerciseSelect').value,s=sessionsFor(name,{meso:state.mesocycle.name}),rows=s.map(x=>({date:x.date,e1rm:x.m.e1rm,volume:x.m.volume,load:x.m.maxWeight})).filter(x=>x.e1rm);if(rows.length){const vals=rows.map(x=>x.e1rm);drawLine($('exerciseChart'),rows,[{key:'e1rm',color:'#93c5fd'}],Math.min(...vals)*.94,Math.max(...vals)*1.06)}else drawLine($('exerciseChart'),[],[],0,1);const nd=s.filter(x=>x.week!==8),first=nd[0],last=nd[nd.length-1],pr=nd.length?Math.max(...nd.map(x=>x.m.e1rm)):0,pct=first&&last?((last.m.e1rm/first.m.e1rm)-1)*100:null;$('exerciseStats').innerHTML=`<div class="stat"><span>Latest e1RM</span><strong>${last?last.m.e1rm.toFixed(1)+' lb':'—'}</strong></div><div class="stat"><span>Meso trend</span><strong>${pct==null?'—':`${pct>=0?'+':''}${pct.toFixed(1)}%`}</strong></div><div class="stat"><span>Best e1RM</span><strong>${pr?pr.toFixed(1)+' lb':'—'}</strong></div>`;$('exerciseHistory').innerHTML=s.length?s.slice(-8).reverse().map(x=>`<div class="historyitem"><strong>${x.date} · W${x.week}</strong><div class="muted">Best load ${x.m.maxWeight} lb · ${x.m.totalReps} reps · volume ${Math.round(x.m.volume).toLocaleString()} · e1RM ${x.m.e1rm.toFixed(1)}</div></div>`).join(''):'<p class="muted">No data yet.</p>'}
+function renderVolume(){const mus=[...new Set(Object.values(PROGRAM).flat().map(x=>x.muscle))],vals=mus.map(m=>currentMesoWorkouts().filter(w=>w.week===state.currentWeek).reduce((a,w)=>a+w.exercises.reduce((b,e)=>b+(exerciseConfig(e.name)?.muscle===m?e.sets.length:0),0),0));drawBars($('volumeChart'),mus.map(x=>x.split('/')[0].slice(0,6)),vals)}
+function renderInsights(){const candidates=['DB Bench','Lat Pulldown','Hack Squat','Chest Supported Row'].map(exerciseInsight).filter(Boolean);const ws=currentMesoWorkouts(),worse=ws.filter(w=>w.symptomResponse==='worse'),cards=[];if(candidates.length)cards.push(...candidates.slice(0,3).map(i=>`<div class="card insight ${i.pct>0?'good':''}"><p>${esc(i.text)}</p></div>`));if(worse.length)cards.push(`<div class="card insight warn"><p>${worse.length} session${worse.length===1?'':'s'} this mesocycle were marked “worse” for back/leg symptoms.${worse.filter(x=>x.aggravator&&x.aggravator!=='Not sure').length?` Most recent suspected aggravator: ${esc(worse.filter(x=>x.aggravator&&x.aggravator!=='Not sure').slice(-1)[0].aggravator)}.`:''}</p></div>`);$('insights').innerHTML=cards.length?cards.join(''):'<div class="card"><p class="muted">More logged sessions will unlock mesocycle insights.</p></div>'}
+function renderTherapyStats(){const logs=state.therapyLogs,total=logs.length,b=logs.filter(x=>x.response==='better').length,s=logs.filter(x=>x.response==='same').length,w=logs.filter(x=>x.response==='worse').length;$('therapyStats').innerHTML=total?`<div class="stats-grid"><div class="stat"><span>Better</span><strong>${b}</strong></div><div class="stat"><span>Same</span><strong>${s}</strong></div><div class="stat"><span>Worse</span><strong>${w}</strong></div></div><p class="muted">${total} therapy sessions logged. This is association tracking, not proof that therapy caused the symptom change.</p>`:'<p class="muted">No therapy responses logged yet.</p>'}
+function renderSettings(){$('mesoNameInput').value=state.mesocycle.name||'Mesocycle 1';$('weekInput').value=state.currentWeek;$('mesoStartInput').value=state.mesocycle.startDate||'';$('therapyPull1').checked=state.settings.therapyDays.includes('Pull 1');$('therapyLegs').checked=state.settings.therapyDays.includes('Legs');$('therapyPull2').checked=state.settings.therapyDays.includes('Pull 2')}
+$('saveMeso').onclick=()=>{state.mesocycle.name=$('mesoNameInput').value.trim()||'Mesocycle 1';state.mesocycle.startDate=$('mesoStartInput').value;state.currentWeek=Math.max(1,Math.min(8,+$('weekInput').value||1));save();renderToday();renderProgram();alert('Mesocycle saved.')}
+$('saveTherapyDays').onclick=()=>{state.settings.therapyDays=[];if($('therapyPull1').checked)state.settings.therapyDays.push('Pull 1');if($('therapyLegs').checked)state.settings.therapyDays.push('Legs');if($('therapyPull2').checked)state.settings.therapyDays.push('Pull 2');save();renderToday();alert('Therapy schedule saved.')}
+function buildArchive(){const ws=currentMesoWorkouts(),names=allExerciseNames(),progress={};names.forEach(n=>{const x=mesoPerformance(n);if(x)progress[n]={startE1RM:+x.first.m.e1rm.toFixed(1),endE1RM:+x.last.m.e1rm.toFixed(1),changePct:+x.change.toFixed(1)}});return{name:state.mesocycle.name,startDate:state.mesocycle.startDate,endDate:today(),workouts:ws.length,progress}}
+$('completeMeso').onclick=()=>{if(!confirm('Archive this 8-week mesocycle and start the next one at Week 1?'))return;state.mesocycle.archives.push(buildArchive());state.timeline.push({date:today(),type:'mesocycle_completed',text:`Completed ${state.mesocycle.name}`});const n=state.mesocycle.archives.length+1;state.mesocycle.name=`Mesocycle ${n}`;state.mesocycle.startDate=today();state.currentWeek=1;save();renderSettings();renderToday();alert('Mesocycle archived. Week 1 targets will seed from your prior non-deload performance.')}
+function download(name,text,type='application/json'){const blob=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),200)}
+$('exportBtn').onclick=()=>download(`brandon-fitness-v3-backup-${today()}.json`,JSON.stringify(state,null,2));
+$('exportCsvBtn').onclick=()=>{const rows=[['date','mesocycle','week','day','exercise','set','weight','reps','rir','e1rm','symptom_response','aggravator']];state.workouts.forEach(w=>w.exercises.forEach(e=>e.sets.forEach((s,i)=>rows.push([w.date,w.mesocycle,w.week,w.day,e.name,i+1,s.weight??'',s.reps??'',s.rir??'',s.weight&&s.reps?e1rm(s.weight,s.reps).toFixed(2):'',w.symptomResponse??'',w.aggravator??'']))));const csv=rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n');download(`brandon-fitness-workouts-${today()}.csv`,csv,'text/csv')}
+$('importFile').onchange=async e=>{try{state=normalize({...clone(DEFAULT),...JSON.parse(await e.target.files[0].text())});save();renderToday();renderProgram();alert('Backup imported.')}catch(err){alert('Could not read that backup.')}}
+$('resetBtn').onclick=()=>{if(confirm('Erase all local Brandon Fitness data on this device?')){localStorage.removeItem(KEY);state=clone(DEFAULT);save();renderToday();renderProgram();alert('Data erased.')}}
+renderToday();renderProgram();if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js'));
