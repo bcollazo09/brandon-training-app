@@ -5,30 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Brandon Fitness">
-<title>Brandon Fitness v3</title>
+<title>Brandon Fitness v4</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <header>
-  <div><small>PERSONAL TRAINING SYSTEM · V3</small><h1>Brandon Fitness</h1></div>
-  <button id="quickAddBtn" class="icon">＋</button>
+  <div>
+    <small>PERSONAL HYPERTROPHY COACH · V4</small>
+    <h1>Brandon Fitness</h1>
+  </div>
+  <div class="header-status">
+    <span id="onlineBadge" class="status-pill">Offline ready</span>
+    <span id="saveBadge" class="status-pill saved">Saved</span>
+  </div>
 </header>
 
 <main>
 <section id="today" class="view active">
+  <div id="resumeBanner" class="card resume-card" hidden></div>
+
   <div class="card hero">
-    <div><small id="mesoLabel"></small><h2 id="dayTitle"></h2><p id="weekText" class="muted"></p></div>
+    <div>
+      <small id="mesoLabel"></small>
+      <h2 id="dayTitle"></h2>
+      <p id="weekText" class="muted"></p>
+    </div>
     <button id="changeDay">Change</button>
   </div>
 
   <div id="weekCard" class="card week-card"></div>
 
   <div class="card compact-checkin">
-    <div class="row"><h3>Quick check-in</h3><span class="muted">4 fields · optional</span></div>
-    <div class="grid">
+    <div class="row"><h3>Quick check-in</h3><span class="muted">optional · used only when actionable</span></div>
+    <div class="grid four">
       <label>Bodyweight<input id="bw" type="number" step="0.1" inputmode="decimal" placeholder="lb"></label>
       <label>Sleep<input id="sleep" type="number" step="0.1" inputmode="decimal" placeholder="hours"></label>
       <label>Back pain<input id="back" type="number" min="0" max="10" inputmode="numeric" placeholder="0–10"></label>
@@ -38,6 +51,34 @@
   </div>
 
   <div id="readinessCard" class="card recommendation"></div>
+  <div id="coachBrief" class="card coach-brief"></div>
+
+  <div class="card controls-card">
+    <div class="row wrap">
+      <div><h3>Session mode</h3><p class="muted no-margin">The coach can trim low-priority work without touching your key sets.</p></div>
+      <select id="timeBudget">
+        <option value="">Normal</option>
+        <option value="45">45 minutes</option>
+        <option value="55">55 minutes</option>
+        <option value="60">60 minutes</option>
+        <option value="75">75 minutes</option>
+        <option value="90">90 minutes</option>
+      </select>
+    </div>
+    <div class="row wrap button-row">
+      <button id="startWorkout" class="primary">Start / Resume workout</button>
+      <button id="restTimerBtn">Rest timer</button>
+      <button id="sessionTemplateBtn">Template</button>
+    </div>
+  </div>
+
+  <div id="restTimer" class="card timer-card" hidden>
+    <div class="row">
+      <div><small>REST TIMER</small><div id="restClock" class="timer-clock">0:00</div></div>
+      <div class="button-row"><button data-add-rest="30">+30s</button><button id="stopRest">Stop</button></div>
+    </div>
+    <div id="restHint" class="tiny"></div>
+  </div>
 
   <div class="row section-row"><h3>Today’s workout</h3><span id="rirBadge" class="pill"></span></div>
   <div id="workout"></div>
@@ -51,31 +92,46 @@
 </section>
 
 <section id="history" class="view">
-  <div class="row"><h2>History</h2><button id="addPastBtn">Add past workout</button></div>
+  <div class="row wrap"><h2>History</h2><div class="button-row"><button id="addPastBtn">Add past workout</button><button id="calendarJump">Calendar</button></div></div>
   <div class="card"><h3>Current mesocycle</h3><div id="mesoSummary"></div></div>
+  <div class="card"><h3>Training calendar</h3><div class="row"><button id="calPrev">‹</button><strong id="calendarTitle"></strong><button id="calNext">›</button></div><div id="calendarGrid" class="calendar"></div></div>
   <div class="card"><h3>Workout history</h3><div id="historyList"></div></div>
 </section>
 
 <section id="progress" class="view">
-  <h2>Analytics</h2>
+  <h2>Analytics v2</h2>
+  <div id="weeklyReview"></div>
   <div id="insights"></div>
+
   <div class="card">
-    <div class="row"><h3>Exercise performance</h3><span class="pill">e1RM-aware</span></div>
+    <div class="row wrap"><h3>Exercise-slot performance</h3><span class="pill">RIR-aware</span></div>
     <select id="exerciseSelect"></select>
     <div id="exerciseStats" class="stats-grid"></div>
-    <canvas id="exerciseChart" width="700" height="300"></canvas>
-    <p class="tiny">Estimated 1RM uses the Epley formula. It lets higher-rep/lower-load sessions count as progress instead of graphing only raw weight.</p>
+    <canvas id="exerciseChart" width="760" height="320"></canvas>
     <div id="exerciseHistory"></div>
   </div>
-  <div class="card"><h3>Weekly direct sets</h3><canvas id="volumeChart" width="700" height="300"></canvas><p class="tiny">Direct working sets only; this is a training-volume overview, not a muscle-growth score.</p></div>
-  <div class="card"><h3>Bodyweight</h3><canvas id="bwChart" width="700" height="280"></canvas><p class="tiny">Line uses logged check-ins. Trend card uses recent averages when enough data exists.</p></div>
-  <div class="card"><h3>Back pain + sciatica</h3><canvas id="painChart" width="700" height="280"></canvas></div>
+
+  <div class="card"><h3>Weekly muscle volume</h3><canvas id="volumeChart" width="760" height="320"></canvas><div id="volumeTable"></div></div>
+  <div class="card"><h3>Effort + total reps</h3><canvas id="effortChart" width="760" height="300"></canvas><p class="tiny">Average logged RIR and total working reps by session for the selected exercise slot.</p></div>
+  <div class="card"><h3>Bodyweight</h3><canvas id="bwChart" width="760" height="280"></canvas></div>
+  <div class="card"><h3>Back pain + sciatica</h3><canvas id="painChart" width="760" height="280"></canvas><p class="tiny">Missing symptom entries stay missing; the chart does not convert them to zero.</p></div>
+  <div class="card"><h3>Symptom associations</h3><div id="symptomAssociations"></div></div>
+  <div class="card"><h3>Workout efficiency</h3><div id="efficiencyStats"></div><canvas id="efficiencyChart" width="760" height="280"></canvas></div>
+  <div class="card"><h3>Adherence</h3><div id="adherenceStats"></div></div>
+  <div class="card"><h3>Mesocycle comparison</h3><div id="mesoCompare"></div></div>
   <div class="card"><h3>Therapy response</h3><div id="therapyStats"></div></div>
 </section>
 
 <section id="program" class="view">
-  <div class="row"><h2>Program</h2><button id="advanceWeek">Advance week</button></div>
+  <div class="row wrap"><h2>Program + Sandbox</h2><div class="button-row"><button id="advanceWeek">Advance week</button><button id="openMesoPlanner">Meso planner</button></div></div>
   <div class="card" id="weekGuide"></div>
+  <div class="card">
+    <h3>Program sandbox</h3>
+    <p class="muted">Adjust base sets for this mesocycle and preview direct weekly volume before committing.</p>
+    <div id="sandboxList"></div>
+    <div id="sandboxVolume"></div>
+    <div class="button-row"><button id="resetSandbox">Reset</button><button id="saveSandbox" class="primary">Save sandbox changes</button></div>
+  </div>
   <div id="programList"></div>
 </section>
 
@@ -87,54 +143,115 @@
     <label>Current week<input id="weekInput" type="number" min="1" max="8"></label>
     <label>Start date<input id="mesoStartInput" type="date"></label>
     <button class="primary full" id="saveMeso">Save</button>
-    <button class="full" id="completeMeso">Complete, archive & start next mesocycle</button>
+    <button class="full" id="completeMeso">Complete, review & start next mesocycle</button>
   </div>
+
+  <div class="card">
+    <h3>Gym profiles</h3>
+    <div id="gymList"></div>
+    <div class="inline-form"><input id="newGymName" placeholder="e.g. Blink Ridgewood"><button id="addGym">Add gym</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Workout templates</h3>
+    <label>Default template<select id="defaultTemplate"></select></label>
+    <div id="templateInfo" class="muted"></div>
+  </div>
+
   <div class="card">
     <h3>Back therapy schedule</h3>
-    <p class="muted">Kept intentionally small. Default: Pull 1 + Legs.</p>
+    <p class="muted">Default remains Pull 1 + Legs.</p>
     <label><input class="inlineCheck" id="therapyPull1" type="checkbox"> Pull 1</label>
     <label><input class="inlineCheck" id="therapyLegs" type="checkbox"> Legs</label>
     <label><input class="inlineCheck" id="therapyPull2" type="checkbox"> Pull 2</label>
     <button class="full" id="saveTherapyDays">Save therapy days</button>
   </div>
+
+  <div class="card">
+    <h3>Automatic backups</h3>
+    <p class="muted">v4 keeps encrypted local snapshots in IndexedDB. For a true portable encrypted backup, export with a passphrase.</p>
+    <label><input class="inlineCheck" id="autoBackupEnabled" type="checkbox"> Automatic local snapshots</label>
+    <div id="backupStatus" class="tiny"></div>
+    <button class="full" id="snapshotNow">Create snapshot now</button>
+    <button class="full" id="restoreSnapshot">Restore latest snapshot</button>
+  </div>
+
   <div class="card">
     <h3>Backup & export</h3>
     <button class="full" id="exportBtn">Export JSON backup</button>
+    <button class="full" id="exportEncryptedBtn">Export encrypted backup</button>
     <button class="full" id="exportCsvBtn">Export workout CSV</button>
-    <label class="file">Import backup<input id="importFile" type="file" accept=".json,application/json"></label>
+    <label class="file">Import JSON / encrypted backup<input id="importFile" type="file" accept=".json,.bf4,application/json,application/octet-stream"></label>
   </div>
-  <div class="card danger-card"><button class="danger full" id="resetBtn">Erase local data</button></div>
+
+  <div class="card">
+    <h3>Cloud sync</h3>
+    <div class="sync-status"><span class="dot"></span><div><strong>Sync-ready, no provider connected</strong><p class="muted no-margin">The v4 data model includes stable IDs, update timestamps, and portable encrypted packages. Cross-device sync still needs a real authenticated backend/provider; this build does not pretend otherwise.</p></div></div>
+  </div>
+
+  <div class="card danger-card"><button class="danger full" id="resetBtn">Erase all v4 local data</button></div>
 </section>
 </main>
 
 <nav>
-<button data-view="today" class="active">Today</button>
-<button data-view="history">History</button>
-<button data-view="progress">Analytics</button>
-<button data-view="program">Program</button>
-<button data-view="settings">Settings</button>
+  <button data-view="today" class="active">Today</button>
+  <button data-view="history">History</button>
+  <button data-view="progress">Analytics</button>
+  <button data-view="program">Program</button>
+  <button data-view="settings">Settings</button>
 </nav>
 
 <dialog id="dayDialog"><h3>Select workout</h3><div id="dayChoices"></div><button id="closeDayDialog" class="full">Cancel</button></dialog>
 
+<dialog id="templateDialog"><h3>Session template</h3><div id="templateChoices"></div><button id="closeTemplateDialog" class="full">Cancel</button></dialog>
+
+<dialog id="subDialog">
+  <h3>Exercise options</h3>
+  <p id="subTitle" class="muted"></p>
+  <div id="subChoices"></div>
+  <button id="skipExercise" class="full">Skip this exercise</button>
+  <button id="cancelSub" class="full">Cancel</button>
+</dialog>
+
 <dialog id="pastDialog">
 <form id="pastForm">
-<h3>Add past workout</h3>
-<div class="grid"><label>Date<input id="pastDate" type="date" required></label><label>Week<input id="pastWeek" type="number" min="1" max="8" required></label></div>
-<label>Workout<select id="pastDay"></select></label>
-<div id="pastExercises"></div>
-<button type="submit" class="primary full">Save past workout</button><button type="button" id="cancelPast" class="full">Cancel</button>
+  <h3>Add past workout</h3>
+  <div class="grid"><label>Date<input id="pastDate" type="date" required></label><label>Week<input id="pastWeek" type="number" min="1" max="8" required></label></div>
+  <label>Workout<select id="pastDay"></select></label>
+  <div id="pastExercises"></div>
+  <button type="submit" class="primary full">Save past workout</button><button type="button" id="cancelPast" class="full">Cancel</button>
+</form>
+</dialog>
+
+<dialog id="editDialog">
+<form id="editForm">
+  <h3>Edit workout</h3>
+  <input id="editWorkoutId" type="hidden">
+  <div class="grid"><label>Date<input id="editDate" type="date" required></label><label>Week<input id="editWeek" type="number" min="1" max="8" required></label></div>
+  <label>Workout<select id="editDay"></select></label>
+  <div id="editExercises"></div>
+  <button type="submit" class="primary full">Save changes</button><button type="button" id="cancelEdit" class="full">Cancel</button>
 </form>
 </dialog>
 
 <dialog id="postDialog">
-<h3>Session response</h3>
-<p class="muted">One quick answer helps the app learn which sessions agree with your back.</p>
-<div class="response-grid">
-<button data-response="better">Better</button><button data-response="same" class="selected">Same</button><button data-response="worse">Worse</button>
-</div>
-<div id="aggravatorWrap" hidden><label>What seemed to aggravate it?<select id="aggravator"></select></label></div>
-<button id="savePostResponse" class="primary full">Save workout</button>
+  <h3>Session response</h3>
+  <p class="muted">This is committed atomically with the workout—closing this dialog does not create a half-saved session.</p>
+  <div class="response-grid">
+    <button data-response="better">Better</button><button data-response="same" class="selected">Same</button><button data-response="worse">Worse</button>
+  </div>
+  <div id="aggravatorWrap" hidden><label>What seemed to aggravate it?<select id="aggravator"></select></label></div>
+  <label>Session notes<textarea id="sessionNotes" rows="3" placeholder="Optional"></textarea></label>
+  <button id="savePostResponse" class="primary full">Save workout</button>
+  <button id="cancelPostResponse" class="full">Back to workout</button>
+</dialog>
+
+<dialog id="mesoPlannerDialog">
+  <h3>Mesocycle planner</h3>
+  <div id="mesoPlannerContent"></div>
+  <button id="plannerDeload" class="full">Start deload now</button>
+  <button id="plannerComplete" class="primary full">Archive & start recommended next cycle</button>
+  <button id="closeMesoPlanner" class="full">Close</button>
 </dialog>
 
 <script src="app.js"></script>
