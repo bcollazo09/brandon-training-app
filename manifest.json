@@ -1,5 +1,5 @@
 {
-  "name": "Brandon Fitness v4",
+  "name": "Brandon Fitness v5",
   "short_name": "Brandon Fitness",
   "start_url": "./",
   "scope": "./",
@@ -8,8 +8,23 @@
   "theme_color": "#0b1020",
   "description": "Local-first hypertrophy training coach with adaptive progression, analytics, symptom tracking and encrypted backups.",
   "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},
-    {"src":"icon.svg","sizes":"512x512","type":"image/svg+xml","purpose":"any"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
   ]
 }
