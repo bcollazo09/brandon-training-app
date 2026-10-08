@@ -1,6 +1,6 @@
 'use strict';
 window.V5={
- build:'5.0.0-preview.1',busy:false,retry:null,conflict:false,audio:null,localRevision:0,localWriteConflict:false,
+ build:'5.0.0-preview.2',busy:false,retry:null,conflict:false,audio:null,localRevision:0,localWriteConflict:false,
  status(text){const b=document.getElementById('syncBadge');if(b)b.textContent=text;const d=document.getElementById('cloudMessage');if(d)d.textContent=text;},
  authSnapshot(){if(!this.session?.user?.id)throw Error('Sign in to use cloud data');return{...this.session,user:{...this.session.user}}},
  assertSession(auth){if(!auth||this.session?.user?.id!==auth.user.id||this.session?.access_token!==auth.access_token)throw Error('Account changed during cloud operation; local data preserved')},
@@ -42,10 +42,10 @@ window.V5={
     const rows=await this.request('/rest/v1/fitness_state?select=revision,payload,updated_at&user_id=eq.'+encodeURIComponent(owner),{},auth);
     const remote=rows[0],remoteRev=remote?.revision||0;
     if(remoteRev!==(meta.revision||0)){this.conflict=true;this.status('Cloud has another version · export both before resolving');document.getElementById('cloudConflict').hidden=false;return}
-    const document=BFCore.migrate(await idbGet('app',STATE_KEY)),fingerprint=JSON.stringify(document);
+    const payload=BFCore.migrate(await idbGet('app',STATE_KEY)),fingerprint=JSON.stringify(payload);
     if(fingerprint===meta.fingerprint){this.status('Synced · '+new Date(meta.at).toLocaleTimeString());return}
     this.assertSession(auth);
-    const result=await this.request('/rest/v1/rpc/fitness_save',{method:'POST',body:JSON.stringify({expected_revision:remoteRev,document})},auth);
+    const result=await this.request('/rest/v1/rpc/fitness_save',{method:'POST',body:JSON.stringify({expected_revision:remoteRev,document:payload})},auth);
     this.assertSession(auth);
     if(result.conflict){this.conflict=true;this.status('Another device saved first · resolve versions');document.getElementById('cloudConflict').hidden=false;return}
     await idbPut('app',{owner,revision:result.revision,fingerprint,at:Date.now()},'v5-sync');

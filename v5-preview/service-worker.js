@@ -1,5 +1,5 @@
 'use strict';
-const PREFIX='bf-v5-isolated-preview-',CACHE=PREFIX+'1',VERSION='5.0.0-preview.1';
+const PREFIX='bf-v5-isolated-preview-',CACHE=PREFIX+'2',VERSION='5.0.0-preview.2';
 const ASSETS=['./','index.html','preview-safety.js','styles.css?v='+VERSION,'app.js?v='+VERSION,'v5-config.js?v='+VERSION,'v5-core.js?v='+VERSION,'v5-runtime.js?v='+VERSION,'coach-engine.js?v='+VERSION,'coach-ui.js?v='+VERSION,'manifest.json','../icon-192.png','../icon-512.png','icon.svg'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith(PREFIX)&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
