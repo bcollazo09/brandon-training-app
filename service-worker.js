@@ -1,62 +1,16 @@
-const CACHE='brandon-fitness-v4-4-data-export';
-const ASSETS=[
-  './',
-  'index.html',
-  'styles.css?v=4.0.4-data-export',
-  'app.js?v=4.0.4-data-export',
-  'recovery.js?v=4.0.4-data-export',
-  'recovery.html',
-  'manifest.json',
-  'icon.svg',
-  'icon-192.png',
-  'icon-512.png',
-  'README.md'
-];
-
-self.addEventListener('install',e=>{
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
-});
-
-self.addEventListener('activate',e=>{
-  e.waitUntil(
-    caches.keys()
-      .then(keys=>Promise.all(keys.filter(k=>k.startsWith('brandon-fitness-v4-')&&k!==CACHE).map(k=>caches.delete(k))))
-      .then(()=>self.clients.claim())
-  );
-});
-
-// Network-first for HTML and versioned app assets.
-// This preserves offline use but aggressively prefers the newest deployed code.
-self.addEventListener('fetch',e=>{
-  if(e.request.method!=='GET') return;
-
-  const url = new URL(e.request.url);
-  const isAppAsset =
-    url.pathname.endsWith('/app.js') ||
-    url.pathname.endsWith('/styles.css') ||
-    e.request.mode === 'navigate';
-
-  if(isAppAsset){
-    e.respondWith(
-      fetch(e.request, {cache:'no-store'})
-        .then(r=>{
-          const copy=r.clone();
-          caches.open(CACHE).then(c=>c.put(e.request,copy));
-          return r;
-        })
-        .catch(()=>caches.match(e.request).then(r=>r||caches.match('./')))
-    );
-    return;
-  }
-
-  e.respondWith(
-    fetch(e.request)
-      .then(r=>{
-        const copy=r.clone();
-        caches.open(CACHE).then(c=>c.put(e.request,copy));
-        return r;
-      })
-      .catch(()=>caches.match(e.request).then(r=>r||caches.match('./')))
-  );
+'use strict';
+const CACHE='brandon-fitness-v5-preview-2';
+const VERSION='5.0.0-preview.2';
+const ASSETS=['./','index.html','styles.css?v='+VERSION,'app.js?v='+VERSION,'v5-config.js?v='+VERSION,'v5-core.js?v='+VERSION,'v5-runtime.js?v='+VERSION,'coach-engine.js?v='+VERSION,'coach-ui.js?v='+VERSION,'manifest.json','icon-192.png','icon-512.png','icon.svg'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS))));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('brandon-fitness-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{
+ if(event.request.method!=='GET')return;
+ const url=new URL(event.request.url);if(url.origin!==self.location.origin)return;
+ if(event.request.mode==='navigate'){
+  event.respondWith((async()=>{const cache=await caches.open(CACHE);try{const response=await fetch(event.request,{cache:'no-store',signal:AbortSignal.timeout(5000)});if(!response.ok)throw Error('Navigation failed');await cache.put('index.html',response.clone());return response;}catch{return await cache.match('index.html');}})());return;
+ }
+ const name=url.pathname.split('/').pop();
+ if(!['app.js','coach-engine.js','coach-ui.js','v5-core.js','v5-runtime.js','v5-config.js','styles.css','manifest.json','icon.svg','icon-192.png','icon-512.png'].includes(name))return;
+ event.respondWith((async()=>{const cache=await caches.open(CACHE),cached=await cache.match(event.request);if(cached)return cached;const response=await fetch(event.request);if(response.ok)await cache.put(event.request,response.clone());return response;})());
 });
