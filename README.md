@@ -1,6 +1,10 @@
-# Brandon Fitness v5 preview
+# Brandon Fitness v5
 
-V5 adds advanced offline coaching, authenticated Supabase sync, cloud version history, and guarded data restoration. Supabase is configured in the Free BrandonFitnessApp organization using only a public publishable key. See V5-COACHING.md for the engine and V5-ROLLOUT.md for the rollout and phone-data requirements. The legacy v4 README below describes the original app.
+V5 adds offline coaching, authenticated Supabase sync, cloud version history, guarded restoration and timer audio. The configured backend uses the Free BrandonFitnessApp organization and a public publishable key. The original GitHub Pages address retains the existing device database, legacy keys and encrypted snapshots.
+
+The supplied v4 export passed exact migration, import, offline reload and export checks in isolated mobile browser profiles. Both iPhone installations were reported to have the same history. Private workout exports are not part of this repository. Physical iPhone storage must be checked from each existing Home Screen installation after updating.
+
+Use the original app address for existing history. The separate /v5-preview/ path has isolated storage. See V5-COACHING.md for the engine and V5-ROLLOUT.md for backup, account and update steps. The following README documents the legacy v4 implementation.
 
 # Brandon Fitness v4 — Local-First Hypertrophy Coach
 

@@ -1,6 +1,6 @@
 'use strict';
 window.V5={
- build:'5.0.0-preview.2',busy:false,retry:null,conflict:false,audio:null,localRevision:0,localWriteConflict:false,
+ build:'5.0.0-preview.3',busy:false,retry:null,conflict:false,audio:null,localRevision:0,localWriteConflict:false,
  status(text){const b=document.getElementById('syncBadge');if(b)b.textContent=text;const d=document.getElementById('cloudMessage');if(d)d.textContent=text;},
  authSnapshot(){if(!this.session?.user?.id)throw Error('Sign in to use cloud data');return{...this.session,user:{...this.session.user}}},
  assertSession(auth){if(!auth||this.session?.user?.id!==auth.user.id||this.session?.access_token!==auth.access_token)throw Error('Account changed during cloud operation; local data preserved')},

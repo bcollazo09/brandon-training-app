@@ -1,26 +1,27 @@
-# Workout preservation and free-tier rollout plan
+# Workout preservation and free-tier rollout
 
-Current state, October 7, 2026: the original Desktop source is backed up in brandon-fitness-desktop-v4-backup.zip; the current GitHub repository history is backed up in brandon-training-repo-backup.bundle. Those are source backups. They do not contain the workouts stored in either iPhone installation.
+V5 is configured for deployment at the original GitHub Pages address, https://bcollazo09.github.io/brandon-training-app/ . The Free Supabase project Brandon Fitness v5 (wnlhutiwrzpprfmhhmtm) provides authenticated sync. Only a public publishable key is shipped; no paid options are enabled.
 
-Supabase project Brandon Fitness v5 (wnlhutiwrzpprfmhhmtm) is configured in the Free BrandonFitnessApp organization. A separate /v5-preview/ deployment uses its own device database and cache; it cannot automatically access either original iPhone installation. The production v4 rollout adds only read-only raw recovery exports. Full v5 replacement remains staged pending verified phone exports. No phone storage has been accessed, deleted, or reset. Tests use synthetic data only; no paid options are enabled.
+## Verified preservation
 
-Before rollout:
+The supplied v4 JSON and CSV agree. Exact migration, import, encrypted-snapshot decryption, normal/raw export and offline reload were tested in fresh mobile browser profiles. The original completed records and active draft were preserved. The user confirmed both iPhone installations have the same history. Private workout backups and test accounts are excluded from this repository. These tests cannot open either physical iPhone installation.
 
-1. Keep both iPhone app installations and their storage. Export each installation's JSON history if it opens. Label the files with the installation and export date. Verify session counts, latest workout dates, exercises, sets, and current draft before accepting the backup. Do not assume the first installation contains the second installation's newer records.
-2. If an installation crashes, use recovery code on the existing app origin to export its raw IndexedDB and legacy localStorage from that installation before any repair. Opening a desktop copy or a new hosting origin does not read that phone's storage. The staged recovery screen preserves keyed raw records, encrypted snapshots, and the device encryption key, while excluding account access tokens.
-3. Check the recovery/export files on the computer and retain an independent portable copy. Inspect the newest workout and total records; do not declare data recovered merely because the app opens.
-4. Stage and validate the free Supabase schema with authenticated ownership isolation and stale-write protection. Use only a public project URL and publishable/anon key in v5-config.js. Never insert a service-role key into frontend files. Test two devices, offline writes, retry, sign-out, and conflict review using test data before connecting the real history.
-5. Retain the original hosting origin for the first upgrade. This keeps the existing local database reachable. Close older v4 tabs before reopening v5: old code does not understand the v5 tab-write revision guard. Do not delete the app icons to refresh code.
-6. The preview keeps a raw pre-v5 copy before migrating schema, requires a successful safety snapshot before import/restore, and aborts stale-tab writes instead of overwriting a newer workout. Equipment changes and accepted live target changes preserve draft snapshots. Storage reset is disabled during the rollout.
-7. Connect verified history to the user's free backend, confirm upload and download on a second test device, and export a portable backup independent of Supabase. Cloud snapshots in the same database are useful versions, not protection against loss of the whole project.
-8. Consider another free frontend host only after verified cloud sync. A new host uses another storage origin; history will need authenticated download or explicit import. GitHub Pages can serve the frontend while Supabase provides backend functionality, so moving hosting is optional.
+Root v5 retains IndexedDB brandonFitnessV4 version 1, the app/state key, original v4 raw snapshot, legacy localStorage and the device encryption key. Replacement operations validate local revision and state fingerprints inside serialized writes. Late edits stop replacement or remain in the replacement document. Failed commits retain durable state and an exportable recovery candidate. Reset remains disabled.
 
-Free-tier boundaries:
+## Open the updated app
 
-- Local coaching, IndexedDB, sound synthesis, and offline assets require no paid APIs or dependencies.
-- Supabase Free has no managed automatic backups and may pause an inactive project. The app therefore needs local preservation, in-project version snapshots, and independent portable exports. [Supabase backup documentation](https://supabase.com/docs/guides/platform/backups), [free-project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).
-- Existing GitHub hosting remains unchanged. No custom domain, paid hosting, paid SMTP service, or native app-store enrollment is required for this phase.
+1. Keep both existing Home Screen icons and the exported backups. Close old running app windows, then reopen each existing installation after deployment. Do not delete icons or clear Safari data.
+2. Confirm the latest completed workouts and unfinished workout are present. Root v5 migrates the existing device database automatically; a normal upgrade does not require import. If it appears empty, preserve that installation and use Settings → Export saved device data before replacing anything.
+3. Use Settings to create an app account, confirm email, and sign in. Email confirmation currently returns to the isolated preview. Return to the existing Home Screen installation and sign in there to sync its history. Use the same account on other devices.
+4. Cloud differences stop automatic replacement. Review/export both versions before choosing a restore. Cloud restore blocks while a workout is active; finish or explicitly discard that draft first.
+5. Keep a portable JSON or encrypted export outside Supabase. In-project snapshots are versions in the same backend, not offsite backups.
 
-Remaining production prerequisite: obtain and verify backups from both iPhone Home Screen installations before promoting full v5 at the original app URL. Open each existing installation; use Settings → Export JSON backup when it opens, or its read-only recovery export if startup fails. Retain both files separately. Opening the isolated preview or a separate Safari tab cannot prove recovery from either installation.
+## Separate preview and recovery
 
-The backend uses owner-only reads, an authenticated public invoker RPC with a private privileged implementation, and a transaction-scoped owner lock plus expected revision comparison. Only a public publishable key is shipped. The restore/import paths now validate a fixed local revision and immutable state fingerprint inside the serialized state-write transaction, preventing edits during asynchronous replacement from being discarded. Raw exports preserve durable data, encrypted snapshots, device key, and any recovery candidate while excluding auth tokens.
+/v5-preview/ uses its own database, keys, cache and service-worker scope. It cannot automatically read original iPhone history. Use an exported copy if testing import. /recovery.html reads the current browser's original storage without modifying it. A Safari tab or desktop browser cannot inspect another Home Screen installation's storage. Raw recovery containers preserve original records, snapshots and device keys; extract the state or decrypt a snapshot before importing. Keep raw exports private and intact.
+
+## Backend and limits
+
+Owner-only reads, an authenticated public invoker RPC with a private owner-bound implementation, transaction owner locking and expected-revision comparison protect cloud saves. Anonymous/direct writes, cross-account access, concurrent stale saves and snapshot restoration were tested with synthetic accounts, then the accounts and their credentials were removed.
+
+The app works locally offline; iPhone may suspend timers/audio while locked. Coaching coefficients are heuristics tested with synthetic scenarios. No paid AI API, hosting, custom domain, SMTP service or app-store enrollment is required. Supabase Free can pause inactive projects and does not include managed automatic database backups; retain independent exports. See [backup documentation](https://supabase.com/docs/guides/platform/backups) and [free-project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).
