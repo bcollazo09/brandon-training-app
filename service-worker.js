@@ -1,9 +1,11 @@
-const CACHE='brandon-fitness-v4-3-recovery';
+const CACHE='brandon-fitness-v4-4-data-export';
 const ASSETS=[
   './',
   'index.html',
-  'styles.css?v=4.0.3-recovery',
-  'app.js?v=4.0.3-recovery',
+  'styles.css?v=4.0.4-data-export',
+  'app.js?v=4.0.4-data-export',
+  'recovery.js?v=4.0.4-data-export',
+  'recovery.html',
   'manifest.json',
   'icon.svg',
   'icon-192.png',
@@ -19,7 +21,7 @@ self.addEventListener('install',e=>{
 self.addEventListener('activate',e=>{
   e.waitUntil(
     caches.keys()
-      .then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+      .then(keys=>Promise.all(keys.filter(k=>k.startsWith('brandon-fitness-v4-')&&k!==CACHE).map(k=>caches.delete(k))))
       .then(()=>self.clients.claim())
   );
 });

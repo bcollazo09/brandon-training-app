@@ -1,24 +1,26 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="preview-safety.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Brandon Fitness">
-<title>Brandon Fitness v4</title>
+<title>Brandon Fitness v5 · Isolated Preview</title>
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="styles.css?v=4.0.4-data-export">
+<link rel="apple-touch-icon" href="../icon-192.png">
+<link rel="stylesheet" href="styles.css?v=5.0.0-preview.1">
 </head>
 <body>
+<aside id="previewBanner" role="note" style="margin:12px auto;padding:12px;max-width:1100px;border:1px solid #e5b846;border-radius:12px;background:#302715;color:#fff4c7"><strong>Isolated v5 preview</strong><br>Your saved iPhone workouts are not loaded automatically. Workouts and backups here are stored separately on this device. Test with sample data or a copy of an exported backup. Signing in uses the cloud account you choose.</aside>
 <header>
   <div>
-    <small>PERSONAL HYPERTROPHY COACH · V4 · RECOVERY 4.0.4-data-export</small>
+    <small>PERSONAL HYPERTROPHY COACH · V5</small>
     <h1>Brandon Fitness</h1>
   </div>
-  <div class="header-status">
+  <div class="header-status"><span id="buildBadge" class="status-pill">V5 preview</span><span id="syncBadge" class="status-pill">Local only</span>
     <span id="onlineBadge" class="status-pill">Offline ready</span>
     <span id="saveBadge" class="status-pill saved">Saved</span>
   </div>
@@ -169,7 +171,7 @@
 
   <div class="card">
     <h3>Automatic backups</h3>
-    <p class="muted">v4 keeps encrypted local snapshots in IndexedDB. For a true portable encrypted backup, export with a passphrase.</p>
+    <p class="muted">This app keeps encrypted local snapshots on this device. For a true portable encrypted backup, export with a passphrase.</p>
     <label><input class="inlineCheck" id="autoBackupEnabled" type="checkbox"> Automatic local snapshots</label>
     <div id="backupStatus" class="tiny"></div>
     <button class="full" id="snapshotNow">Create snapshot now</button>
@@ -180,16 +182,22 @@
     <h3>Backup & export</h3>
     <button class="full" id="exportBtn">Export JSON backup</button>
     <button class="full" id="exportEncryptedBtn">Export encrypted backup</button>
+    <button class="full" id="exportRaw">Export raw device recovery</button>
     <button class="full" id="exportCsvBtn">Export workout CSV</button>
     <label class="file">Import JSON / encrypted backup<input id="importFile" type="file" accept=".json,.bf4,application/json,application/octet-stream"></label>
   </div>
 
   <div class="card">
-    <h3>Cloud sync</h3>
-    <div class="sync-status"><span class="dot"></span><div><strong>Sync-ready, no provider connected</strong><p class="muted no-margin">The v4 data model includes stable IDs, update timestamps, and portable encrypted packages. Cross-device sync still needs a real authenticated backend/provider; this build does not pretend otherwise.</p></div></div>
+    <h3>Cloud sync + account</h3><p id="cloudMessage">Saved locally · sign in for cloud sync</p>
+    <label>Email<input id="cloudEmail" type="email" autocomplete="username"></label>
+    <label>Password<input id="cloudPassword" type="password" autocomplete="current-password"></label>
+    <div class="button-row"><button id="cloudLogin">Sign in</button><button id="cloudSignup">Create app account</button><button id="cloudLogout">Sign out</button><button id="cloudSync">Sync now</button></div>
+    <div id="cloudConflict" hidden><p>Two versions need review. Export both before choosing. Your local version stays saved until you choose the cloud version.</p><button id="cloudLocalExport">Export local version</button><button id="exportCloud">Export cloud version</button><button id="useCloud">Use cloud version · preserve local backup</button></div>
+    <p class="tiny">Offline writes stay on this device. Other-device changes require review. Cloud snapshots retain up to 30 daily versions plus 10 recent versions. Export portable backups regularly.</p>
   </div>
+  <div class="card"><h3>Rest timer sound</h3><button id="testSound">Test chime + vibration</button><p class="tiny">Tap once to enable sound. Sound works while the app is active; iPhone may suspend timers when locked. Vibration works only on supported devices.</p></div>
 
-  <div class="card danger-card"><button class="danger full" id="resetBtn">Erase all v4 local data</button></div>
+  <div class="card danger-card"><button class="danger full" id="resetBtn" disabled>Data reset unavailable during rollout</button></div>
 </section>
 </main>
 
@@ -254,7 +262,6 @@
   <button id="closeMesoPlanner" class="full">Close</button>
 </dialog>
 
-<script src="recovery.js?v=4.0.4-data-export"></script>
-<script src="app.js?v=4.0.4-data-export"></script>
+<dialog id="coachProfileDialog"><form id="coachProfileForm"><h3 id="coachProfileTitle">Equipment + progression</h3><p class="tiny">Different machines, pulley ratios, and logging conventions need separate baselines. These settings apply to this exercise slot at this gym.</p><label>Equipment name<input id="coachEquipment" required placeholder="e.g. Cable station by the mirrors"></label><label>How weight changes difficulty<select id="coachMode"><option value="unknown">Choose a convention</option><option value="external">More weight is harder</option><option value="assistance">More weight is more assistance</option><option value="bodyweight">Bodyweight only</option></select></label><label>Weight you enter<select id="coachBasis"><option value="unknown">Choose weight basis</option><option value="stack">Machine or cable stack</option><option value="total">Total resistance</option><option value="per-hand">Per dumbbell / per hand</option><option value="added-weight">Added weight</option><option value="assistance">Assistance weight</option><option value="bodyweight">Bodyweight only, entered as 0</option></select></label><label>Smallest load step, lb<input id="coachIncrement" type="number" min="0.25" step="0.25" required></label><label>Available loads, optional<input id="coachLoads" placeholder="10, 12.5, 15, 17.5"></label><label><input id="coachLegacy" type="checkbox" class="inlineCheck"> My earlier logs in this slot used this same equipment and weight basis</label><p class="tiny">Leave this unchecked for different equipment. Earlier workouts remain preserved; they will not supply loads for this setup.</p><button type="submit" class="primary full">Save equipment + rebuild target</button><button type="button" id="closeCoachProfile" class="full">Cancel</button></form></dialog><script src="v5-config.js?v=5.0.0-preview.1"></script><script src="v5-core.js?v=5.0.0-preview.1"></script><script src="v5-runtime.js?v=5.0.0-preview.1"></script><script src="coach-engine.js?v=5.0.0-preview.1"></script><script src="coach-ui.js?v=5.0.0-preview.1"></script><script src="app.js?v=5.0.0-preview.1"></script>
 </body>
 </html>
